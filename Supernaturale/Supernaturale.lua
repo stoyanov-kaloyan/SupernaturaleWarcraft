@@ -1,7 +1,5 @@
 -- Create the main frame for your addon
 local Supernaturale = CreateFrame("Frame")
-Supernaturale:RegisterEvent("CHAT_MSG_LOOT") -- Register for loot events
-Supernaturale:RegisterEvent("ADDON_LOADED") -- Register for addon loaded events
 
 -- Create a function to play the sound
 local function play_sound()
@@ -37,19 +35,47 @@ local function DisplayFunkyText(text, fontSize, duration)
 end
 
 -- Function to handle loot events and trigger the sound
-local function HandleLootCelebration(event, arg1, addon)
+-- local function HandleLootCelebration(event, arg1, addon)
+--     if event == "CHAT_MSG_LOOT" or event == "PLAYER_XP_UPDATE" then
+--         play_sound()
+--         DisplayFunkyText("UDRI SIRENYE!!!!!", 36, 5)
+--         print("aide")
+--         -- Add more celebration effects or sound here
+--     end
+--     if addon == "Supernaturale" then
+--         print("Supernaturale loaded!")
+--     end
+-- end
+
+Supernaturale:RegisterEvent("CHAT_MSG_LOOT") -- Register for loot events
+Supernaturale:RegisterEvent("ADDON_LOADED") -- Register for addon loaded events
+Supernaturale:RegisterEvent("PLAYER_XP_UPDATE") -- Register for combat log events
+
+-- Register the loot event handler
+Supernaturale:SetScript("OnEvent", function(self, event, addon)
     if event == "CHAT_MSG_LOOT" then
-        play_sound()
-        DisplayFunkyText("UDRI SIRENYE!!!!!", 36, 5)
-        -- Add more celebration effects or sound here
+        local player, itemLink = string.match(arg1, "(.+) receives (.+).")
+        if player and itemLink then
+            local _, _, quality, _, _, itemType = GetItemInfo(itemLink)
+            if quality == 2 then
+                print(player .. " received an uncommon item: " .. itemLink)
+                play_sound()
+                DisplayFunkyText("UDRI SIRENYE!!!!!", 36, 5)
+                print("aide")
+                -- Add more celebration effects or sound here
+            end
+        end
     end
+    -- if event == "CHAT_MSG_LOOT" then
+    --     play_sound()
+    --     DisplayFunkyText("UDRI SIRENYE!!!!!", 36, 5)
+    --     print("aide")
+    --     -- Add more celebration effects or sound here
+    -- end
     if addon == "Supernaturale" then
         print("Supernaturale loaded!")
     end
-end
-
--- Register the loot event handler
-Supernaturale:SetScript("OnEvent", HandleLootCelebration)
+end)
 
 -- Slash command for testing the sound effect
 SLASH_CHEESE1 = "/cheese"
